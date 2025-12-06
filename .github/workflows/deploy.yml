@@ -1,0 +1,21 @@
+name: 部署点单系统
+on:
+  push:
+    branches: [master] # 你上传代码的分支（之前用的是master，就保持这个）
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: 加载密钥并部署
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # 读取仓库配的密钥
+        run: |
+          echo "GITHUB_TOKEN=$GITHUB_TOKEN" > .env
+          npm install
+          npm run build || true # 没build命令也不报错，纯静态页忽略这句
+      - name: 部署到GitHub Pages（网页能公开访问）
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./ # 发布整个项目文件夹（你的网页文件都在这）
